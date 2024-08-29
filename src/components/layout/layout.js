@@ -1,17 +1,40 @@
 import React, { useState } from 'react';
-import { FaTachometerAlt, FaUser, FaChartBar } from 'react-icons/fa'; // Importing icons from react-icons
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
+import { FaChevronDown } from 'react-icons/fa';
+import { routesData } from '../../utils/routes_data';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Layout({ children }) {
+    const navigate = useNavigate();
+    const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [activeNav, setActiveNav] = useState('Dashboard'); // State to track active navigation item
+    const [openDropdown, setOpenDropdown] = useState(null);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+    // Update activeNav based on location.pathname
+    const getActiveNav = () => {
+        for (const item of routesData) {
+            if (item.path === location.pathname) return item.label;
+            if (item.child) {
+                for (const child of item.child) {
+                    if (child.path === location.pathname) return child.label;
+                }
+            }
+        }
+        return '';
     };
 
-    const handleNavClick = (navItem) => {
-        setActiveNav(navItem);
+    const [activeNav, setActiveNav] = useState(getActiveNav());
+
+    const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+
+    const handleNavClick = (navItem, path, index) => {
+        if (navItem.child) {
+            setOpenDropdown(prev => (prev === index ? null : index));
+        } else {
+            setActiveNav(navItem.label); // Update activeNav here
+            navigate(path);
+            setIsSidebarOpen(false);
+        }
     };
 
     return (
@@ -19,7 +42,7 @@ export default function Layout({ children }) {
             {/* Sidebar */}
             <div
                 className={`z-50 fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-blue-700 to-blue-500 p-4 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } md:relative md:translate-x-0 transition-transform duration-300 ease-in-out`}
+                    } md:relative md:translate-x-0 transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar`}
             >
                 <div className='text-white mb-4'>
                     {/* User Profile */}
@@ -30,30 +53,43 @@ export default function Layout({ children }) {
                     {/* Menu Items */}
                     <nav>
                         <ul className='space-y-4'>
-                            <li
-                                className={`flex items-center space-x-2 cursor-pointer hover:text-blue-300 ${activeNav === 'Dashboard' ? 'font-semibold' : ''
-                                    }`}
-                                onClick={() => handleNavClick('Dashboard')}
-                            >
-                                <FaTachometerAlt />
-                                <span>Dashboard</span>
-                            </li>
-                            <li
-                                className={`flex items-center space-x-2 cursor-pointer hover:text-blue-300 ${activeNav === 'Profiles' ? 'font-semibold' : ''
-                                    }`}
-                                onClick={() => handleNavClick('Profiles')}
-                            >
-                                <FaUser />
-                                <span>Profiles</span>
-                            </li>
-                            <li
-                                className={`flex items-center space-x-2 cursor-pointer hover:text-blue-300 ${activeNav === 'Reports' ? 'font-semibold' : ''
-                                    }`}
-                                onClick={() => handleNavClick('Reports')}
-                            >
-                                <FaChartBar />
-                                <span>Reports</span>
-                            </li>
+                            {routesData.map((item, index) => (
+                                <li key={index}>
+                                    <div
+                                        className={`text-md flex items-center space-x-2 cursor-pointer hover:text-blue-300 ${activeNav === item.label ? 'font-semibold' : ''}`}
+                                        onClick={() => handleNavClick(item, item.path, index)}
+                                    >
+                                        <item.icon className='text-2xl' />
+                                        <span>{item.label}</span>
+                                        {item.child && (
+                                            <FaChevronDown
+                                                className={`ml-auto transform transition-transform duration-300 ease-in-out ${openDropdown === index ? 'rotate-180' : 'rotate-0'}`}
+                                            />
+                                        )}
+                                    </div>
+                                    {item.child && (
+                                        <ul
+                                            className={`mt-3 space-y-3 ml-6 overflow-hidden transition-all duration-500 ease-in-out transform ${openDropdown === index ? 'max-h-40 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-2'
+                                                }`}
+                                        >
+                                            {item.child.map((childItem, childIndex) => (
+                                                <li
+                                                    key={childIndex}
+                                                    className={`text-sm flex items-center space-x-2 cursor-pointer hover:text-blue-300 ${activeNav === childItem.label ? 'font-semibold' : ''}`}
+                                                    onClick={() => {
+                                                        setActiveNav(childItem.label); // Update activeNav here
+                                                        navigate(childItem.path);
+                                                        setIsSidebarOpen(false);
+                                                    }}
+                                                >
+                                                    <childItem.icon className='text-xl' />
+                                                    <span>{childItem.label}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </li>
+                            ))}
                         </ul>
                     </nav>
                 </div>
@@ -62,30 +98,25 @@ export default function Layout({ children }) {
             {/* Main content area */}
             <div className='flex-1 flex flex-col overflow-y-auto'>
                 {/* Top bar with toggle button */}
-                <div className='min-h-20 shadow-md sticky flex items-center p-4 bg-white top-0 z-10'>
+                <div className='min-h-20 shadow-md sticky flex items-center p-4 bg-white top-0 z-10 space-x-2'>
+                    <button
+                        onClick={toggleSidebar}
+                        className='md:hidden text-gray-700 text-2xl focus:outline-none'
+                    >
+                        <HiOutlineMenuAlt2 />
+                    </button>
                     <div className='flex-1'>
-                        <button
-                            onClick={toggleSidebar}
-                            className='md:hidden text-gray-700 text-4xl focus:outline-none'
-                        >
-                            <HiOutlineMenuAlt2 />
-
-                        </button>
+                        <label className='text-2xl font-semibold text-gray-800'>{activeNav}</label>
                     </div>
-
                     <div className='flex space-x-2 cursor-pointer'>
-                        <div
-                            className='w-12 h-12 rounded-full bg-blue-500 text-white font-bold text-2xl flex justify-center items-center'
-                        >
+                        <div className='w-12 h-12 rounded-full bg-blue-500 text-white font-bold text-2xl flex justify-center items-center'>
                             J
                         </div>
-
-                        <div>
-                            <h2 className='text-lg font-semibold'>John Christian Alvarez</h2>
-                            <p className='text-sm'>johnchristianalvarezbsit2k19@gmail.com</p>
+                        <div className='hidden md:block'>
+                            <h2 className='text-lg font-semibold'>John Doe</h2>
+                            <p className='text-sm'>johndoe@gmail.com</p>
                         </div>
                     </div>
-
                 </div>
 
                 {/* Main content */}

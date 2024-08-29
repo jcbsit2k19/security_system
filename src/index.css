@@ -6,3 +6,40 @@
   font-family: "Montserrat";
   src: url("../public/fonts/Montserrat-VariableFont_wght.ttf");
 }
+
+/* Hide scrollbar by default */
+.custom-scrollbar {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 0px; /* For Chrome, Safari, and Opera */
+  transition: width 0.3s ease; /* Smooth transition for scrollbar width */
+}
+
+/* Ensure the track is styled correctly */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e0f2fe; /* Light blue background */
+}
+
+/* Ensure the thumb is styled correctly */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #38bdf8; /* Blue handle */
+  border-radius: 10px;
+  border: 2px solid #e0f2fe; /* Light blue border */
+  transition: background-color 0.3s ease; /* Smooth transition for color */
+}
+
+/* Show scrollbar on hover with animation */
+.custom-scrollbar:hover {
+  scrollbar-width: thin; /* For Firefox */
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar {
+  width: 8px; /* Increase width with a transition */
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: #0284c7; /* Darker blue on hover */
+}

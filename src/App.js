@@ -2,6 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import SigninPage from './pages/signin';
 import SignupPage from './pages/signup';
 import DashboardPage from './pages/dashboard';
+import ProfilePage from './pages/profile';
+import TurnstyleReportPage from './pages/reports/turnstyle_report';
+
+import Layout from './components/layout/layout';
+
 
 
 function App() {
@@ -19,8 +24,17 @@ function App() {
           />
           <Route
             path='/dashboard'
-            element={<DashboardPage />}
+            element={<Layout><DashboardPage /></Layout>}
           />
+          <Route
+            path='/profiles'
+            element={<Layout><ProfilePage /></Layout>}
+          />
+          <Route
+            path='/turnstyle-report'
+            element={<Layout><TurnstyleReportPage /></Layout>}
+          />
+
 
         </Routes>
       </BrowserRouter>
