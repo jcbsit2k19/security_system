@@ -29,7 +29,7 @@ export default function TurnStyleReportPage() {
     return (
         <div className="p-6">
             <div className="container mx-auto">
-                <div className="bg-white p-4 rounded-lg shadow-md mb-6 border-l-4 border-blue-500">
+                <div className="bg-white p-4 rounded-lg shadow-md mb-6">
                     <h2 className="text-xl font-semibold text-gray-700 mb-4">Generate Report</h2>
                     <div className="mb-4">
                         <label htmlFor="reportType" className="text-md font-semibold text-gray-700 mb-4">Report Type</label>
@@ -80,7 +80,7 @@ export default function TurnStyleReportPage() {
                 </div>
 
                 {reportUrl && (
-                    <div className="bg-white p-4 rounded-lg shadow-md mt-6 border-l-4 border-blue-500">
+                    <div className="bg-white p-4 rounded-lg shadow-md mt-6">
                         <h2 className="text-xl font-semibold text-gray-700 mb-4">Report Download</h2>
                         <p className="text-gray-600 mb-4">Your report is ready. You can download it using the link below:</p>
                         <a
